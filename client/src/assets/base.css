@@ -46,7 +46,7 @@ nav h5 {
 
 .sidenav {
     padding: 1rem;
-    font-size:calc(12px + .15dvw);
+    font-size:calc(12px + .25dvw);
 }
 
 .sidenav input#collapsible-group {
@@ -263,12 +263,13 @@ input[type="text"]:disabled {
     letter-spacing: 1px;
     color: #ffffff;
     text-shadow: 1px 2px var(--blue-dark);
+    transition: all .05s ease-in-out
+}
+
+.full-width {
+    width: 100%;
 }
 
 .btn:hover {
     opacity: .95;
-}
-
-.btn:active {
-    transform: scale(.98);
 }

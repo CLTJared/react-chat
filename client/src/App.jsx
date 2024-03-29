@@ -53,7 +53,7 @@ function App() {
           <h5>{whoAmI}</h5>
           <div className="__chat_connect">
             <p>Connected: {chatConnected ? '🟢' : '🔴'}</p>
-            {!chatConnected ? <button className="btn" onClick={connectChat}>Connect</button> : <button className="btn" onClick={disconnectChat}>Disconnect</button>}
+            {!chatConnected ? <button className="btn full-width" onClick={connectChat}>Connect</button> : <button className="btn full-width" onClick={disconnectChat}>Disconnect</button>}
           </div>
           <br />
           <input type="checkbox" id="collapsible-group" defaultChecked /><label htmlFor="collapsible-group" className="arrow" >Chat Users</label>

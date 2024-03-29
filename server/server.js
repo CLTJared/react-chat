@@ -23,8 +23,9 @@ socketIO.on('connect', (socket) => {
   socketIO.emit('userList', currUsers)
 
   socket.on('disconnect', () => {
-    const newUsers = currUsers.filter((user) => socket.id !== user.id)
-    socketIO.emit('userList', newUsers)
+    currUsers = currUsers.filter((user) => socket.id !== user.id)
+    console.info(`${socket.id} | user disconnected.`)
+    socketIO.emit('userList', currUsers)
   })
 
   socket.on('messages', (data) => {

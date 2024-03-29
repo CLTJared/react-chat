@@ -1,6 +1,7 @@
 const express = require("express");
 const app = express();
 const PORT = 4000;
+const path = require('path');
 
 const http = require('http').Server(app);
 const cors = require('cors');
@@ -36,6 +37,14 @@ app.get('/api', (req, res) => {
     message: 'Hello world',
   });
 });
+
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.static(path.join(__dirname, '../client/dist')));
+
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '../client/dist/index.html'));
+  });
+} 
 
 http.listen(PORT, () => {
   console.log(`Server listening on ${PORT}`);

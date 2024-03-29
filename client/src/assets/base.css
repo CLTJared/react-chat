@@ -32,14 +32,21 @@ body {
 }
 
 nav {
-    flex: 0 0 15rem;
+    flex: 0 0 calc(12rem + 5svw);
     min-height: 100dvh;
     background-color: var(--blue-main);
     color: #fff;
 }
 
+nav h5 {
+    font-size:calc(12px + .25dvw);
+    margin: 0;
+    padding: 0;
+}
+
 .sidenav {
     padding: 1rem;
+    font-size:calc(12px + .15dvw);
 }
 
 .sidenav input#collapsible-group {
@@ -88,7 +95,6 @@ ul {
     margin-left: 0;
     padding-left: 0;
 }
-
 
 ul.important li {
     font-weight: normal;
@@ -153,7 +159,7 @@ span.label:empty {
 }
 
 nav h1 {
-    margin: 0;
+    margin: 0 .5rem;
     padding: 0;
     font-size: 125%;
 }
@@ -161,19 +167,12 @@ nav h1 {
 div.info {
     max-height: 0;
     overflow: hidden;
-    transition: all .25s;
+    transition: all 1s ease-in-out;
     padding-top: .5rem;
 }
 
 .info p {
-    font-size: 75%;
-        vertical-align: sub;
-    margin: 0;
-    padding: 0;
-        line-height: 1.75rem;
-    margin-left: .5rem;
-    margin-right: .5rem;
-    font-size: 75%;
+    vertical-align: sub;
 }
 
     .online:before {
@@ -205,6 +204,7 @@ div[name='chat-bubble'] {
     width: fit-content;
     position: relative;
     margin-bottom: 1rem;
+    font-size: calc(12px + .5dvw);
 }
 
 div[name='chat-bubble'].out {
@@ -240,15 +240,21 @@ input[type="text"] {
     border: 1px solid transparent;
     padding: 1rem .5rem;
     border-radius: 5px;
+    margin-bottom: .5rem;
 }
 
 input[type="text"]:focus {
     border: 1px solid var(--blue-highlight);
 }
 
+input[type="text"]:disabled {
+    border: 1px solid var(--grey);
+    opacity: .5;
+}
+
 .btn {
-    padding: .5rem 1rem;
-    margin: .5rem .25rem .5rem 0;
+    padding: .5rem;
+    margin: .25rem .15rem .25rem 0;
     cursor: pointer;
     background-image: linear-gradient(var(--blue-light), var(--blue-dark));
     border: 1px solid var(--blue-dark);
@@ -257,4 +263,12 @@ input[type="text"]:focus {
     letter-spacing: 1px;
     color: #ffffff;
     text-shadow: 1px 2px var(--blue-dark);
+}
+
+.btn:hover {
+    opacity: .95;
+}
+
+.btn:active {
+    transform: scale(.98);
 }

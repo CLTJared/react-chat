@@ -2,6 +2,8 @@ const express = require("express");
 const app = express();
 const PORT = process.env.PORT || 4000;
 const path = require('path');
+const siteURL = process.env.SITEURL || 'http://localhost:3000' ;
+
 
 const http = require('http').Server(app);
 const cors = require('cors');
@@ -11,20 +13,18 @@ let currUsers = [];
 
 const socketIO = require('socket.io')(http, {
   cors: {
-    origin: "https://react-chat-r4y1.onrender.com"
+    origin: siteURL
   }
 })
 
 socketIO.on('connect', (socket) => {
-  console.log(`${socket.id} user just connected.`)
+  console.info(`${socket.id} | user connected.`)
   currUsers.push({id: socket.id})
   socketIO.emit('userList', currUsers)
 
   socket.on('disconnect', () => {
-    console.log(`${socket.id} - User disconnected.`)
-    
-    currUsers = currUsers.filter((user) => socket.id !== user.id)
-    socketIO.emit('userList', currUsers)
+    const newUsers = currUsers.filter((user) => socket.id !== user.id)
+    socketIO.emit('userList', newUsers)
   })
 
   socket.on('messages', (data) => {
@@ -34,7 +34,7 @@ socketIO.on('connect', (socket) => {
 
 app.get('/api', (req, res) => {
   res.json({
-    message: 'Hello world',
+    message: 'API coming soon...',
   });
 });
 

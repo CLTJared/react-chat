@@ -15,6 +15,7 @@ function App() {
   const disconnectChat = () => {
     socket.disconnect()
     setChatConnected(false)
+    setChatUsers([])
   };
 
   const handleNewChat = (e) => {
@@ -26,7 +27,7 @@ function App() {
       id: crypto.randomUUID(),
       message: chatMessage.current.value,
       socketID: socket.id,
-      time: ('0'+d.getHours()).slice(-2) + ":" + ('0'+d.getMinutes()).slice(-2) + ":" + ('0'+d.getSeconds()).slice(-2),
+      time: ('0'+d.getHours()).slice(-2) + ":" + ('0'+d.getMinutes()).slice(-2),
     })
 
     e.target.reset();
@@ -42,22 +43,20 @@ function App() {
 
   useEffect(() => {
     socket.on('userList', (data) => setChatUsers(data))
-  }, [chatUsers])
+  }, [])
 
   return (
     <>
       {/* Make Nav Component */}
       <nav>
         <div className="sidenav">
-          <h5>ID: {whoAmI}</h5>
+          <h5>{whoAmI}</h5>
           <div className="__chat_connect">
-            <p>Connected: {chatConnected ? 'Yes' : 'No'}</p>
-            <button className="btn" onClick={connectChat}>Join Chat</button>
-            &nbsp;
-            <button className="btn" onClick={disconnectChat}>Leave Chat</button>
+            <p>Connected: {chatConnected ? '🟢' : '🔴'}</p>
+            {!chatConnected ? <button className="btn" onClick={connectChat}>Connect</button> : <button className="btn" onClick={disconnectChat}>Disconnect</button>}
           </div>
           <br />
-          <input type="checkbox" id="collapsible-group" defaultChecked /><label htmlFor="collapsible-group" className="arrow" >Anony ChatGroup</label>
+          <input type="checkbox" id="collapsible-group" defaultChecked /><label htmlFor="collapsible-group" className="arrow" >Chat Users</label>
           <div className="__chat_info">
             {chatUsers.map((data, index) => <p name="user" key={index}>{data.id}</p>)}
           </div>
@@ -67,17 +66,15 @@ function App() {
 
       {/* Body Content */}
       <section>
-        &nbsp;
         <div>
           <form onSubmit={handleNewChat}>
-            <input ref={chatMessage} type="text" placeholder="Enter your message..." />
+            <input ref={chatMessage} type="text" placeholder="Enter your message..." disabled={!chatConnected} />
           </form>
         </div>
         <br />
         <div>
           {chatMessages.map((chat, index) => chat.socketID === whoAmI ? <div name="chat-bubble" key={index} className="out"><span className="username">{chat.socketID} | {chat.time}</span>{chat.message}</div> : <div name="chat-bubble" key={index} className="in"><span className="username">{chat.socketID} | {chat.time}</span>{chat.message}</div>)}
         </div>
-        &nbsp;
       </section>
       {/* End Body Content */}
     </>

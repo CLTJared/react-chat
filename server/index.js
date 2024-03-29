@@ -10,7 +10,7 @@ let currUsers = [];
 
 const socketIO = require('socket.io')(http, {
   cors: {
-    origin: "http://localhost:3000"
+    origin: "https://react-chat-r4y1.onrender.com"
   }
 })
 

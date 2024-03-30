@@ -19,13 +19,22 @@ const socketIO = require('socket.io')(http, {
 
 socketIO.on('connect', (socket) => {
   console.info(`${socket.id} | user connected.`)
-  currUsers.push({id: socket.id})
+  currUsers.push({id: socket.id, nickname: ''})
+    console.error('userList:', currUsers)
   socketIO.emit('userList', currUsers)
 
   socket.on('disconnect', () => {
     currUsers = currUsers.filter((user) => socket.id !== user.id)
     console.info(`${socket.id} | user disconnected.`)
+    console.error('userList:', currUsers)
     socketIO.emit('userList', currUsers)
+  })
+
+  socket.on('userUpdate', (data) => {
+    console.log('nickname:', data.nickname)
+    currUsers = currUsers.map((user) => user.id === data.id ? {...user, nickname: data.nickname}: user)
+    socketIO.emit('userList', currUsers)
+      console.error('userUpdate:', currUsers)
   })
 
   socket.on('messages', (data) => {

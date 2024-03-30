@@ -1,11 +1,15 @@
-import { useState, useRef, useEffect } from 'react';
-import { socket } from './components/socket';
+import { useState, useRef, useEffect, useMemo } from 'react';
+import { io } from 'socket.io-client';
+
+const URL = process.env.NODE_ENV === 'production' ? process.env.SITEURL : 'http://localhost:4000';
+export const socket = io.connect(URL);
 
 function App() {
   const [chatConnected, setChatConnected] = useState(socket.connected);
   const [chatMessages, setChatMessage] = useState([]);
   const [chatUsers, setChatUsers] = useState([]);
-  const whoAmI = socket.id;
+  const whoami = socket.id;
+  const chatNickname = useRef();
   const chatMessage = useRef();
   const NewUserCheck = useRef();
   const NewMsgCheck = useRef();
@@ -18,7 +22,9 @@ function App() {
     socket.disconnect()
     setChatConnected(false)
     setChatUsers([])
+    chatNickname.current.value = ''
   };
+
 
   const handleNewChat = (e) => {
     e.preventDefault();
@@ -30,6 +36,7 @@ function App() {
 
     socket.emit('messages', {
       id: crypto.randomUUID(),
+      nickname: chatNickname.current.value,
       message: chatMessage.current.value,
       socketID: socket.id,
       time: ('0'+d.getHours()).slice(-2) + ":" + ('0'+d.getMinutes()).slice(-2),
@@ -45,6 +52,7 @@ const newSound = (type, freq, gain, len) => {
   var vol = context.createGain();
   osc.type = type; // this is the default - also square, sawtooth, triangle
   osc.frequency.value = freq; // Hz
+  vol.gain.value = 0;
   vol.gain.value = gain;
 
   osc.connect(vol); // set the volume
@@ -53,26 +61,37 @@ const newSound = (type, freq, gain, len) => {
   osc.stop(context.currentTime + len);
 }
 
+  const handleNickname = (e) => {
+    e.preventDefault();
+    socket.emit('userUpdate', {
+      id: socket.id,
+      nickname: chatNickname.current.value
+    })
+  }
+
+  useEffect(() => {
+    socket.on('msgResponse', (data) => {
+      setChatMessage([...chatMessages, data])
+      if(NewMsgCheck.current.checked) newSound('triangle', 510, .005, .25)
+    })
+    
+    socket.on('userList', (data) => {
+      setChatUsers(data)
+      if(NewUserCheck.current.checked) newSound('sine', 400, .02, .05)
+    })
+  }, [socket, chatMessages, chatUsers])
+
+
   useEffect(() => {
     setChatConnected(socket.connected)
-  })
-
-  useEffect(() => {
-    socket.on('msgResponse', (data) => setChatMessage([...chatMessages, data]))
-    if(NewMsgCheck.current.checked) newSound('triangle', 510, .005, .25)
-  }, [socket, chatMessages])
-
-  useEffect(() => {
-    socket.on('userList', (data) => setChatUsers(data))
-    if(NewUserCheck.current.checked) newSound('sine', 935, .02, .25)
-  }, [chatUsers])
+  }, [])
 
   return (
     <>
       {/* Make Nav Component */}
       <nav>
         <div className="sidenav">
-          <h5>{whoAmI}</h5>
+            <input type="text" placeholder={whoami} ref={chatNickname} disabled={!chatConnected} onBlur={handleNickname} onKeyPress={(e) => { if(e.key === 'Enter') {e.target.blur()} }} />
           <div className="__chat_connect">
             <p>Connected: {chatConnected ? '🟢' : '🔴'}</p>
             {!chatConnected ? <button className="btn full-width" onClick={connectChat}>Connect</button> : <button className="btn full-width" onClick={disconnectChat}>Disconnect</button>}
@@ -80,7 +99,7 @@ const newSound = (type, freq, gain, len) => {
           <br />
           <input type="checkbox" id="collapsible-group" defaultChecked /><label htmlFor="collapsible-group" className="arrow" >Chat Users</label>
           <div className="__chat_info">
-            {chatUsers.map((data, index) => <p name="user" key={index}>{data.id}</p>)}
+            {chatUsers.map((data, index) => <p name="user" key={index}>{data.nickname !== '' ? data.nickname : data.id}</p>)}
           </div>
           <div>
             <hr />
@@ -103,7 +122,7 @@ const newSound = (type, freq, gain, len) => {
         </div>
         <br />
         <div style={{paddingTop: '.5rem' }}>
-          {chatMessages.map((chat, index) => chat.socketID === whoAmI ? <div name="chat-bubble" key={index} className="out"><span className="username">{chat.socketID} | {chat.time}</span>{chat.message}</div> : <div name="chat-bubble" key={index} className="in"><span className="username">{chat.socketID} | {chat.time}</span>{chat.message}</div>)}
+          {chatMessages.map((chat, index) => chat.socketID === whoami ? <div name="chat-bubble" key={index} className="out" title={chat.socketID}><span className="username">{chat.nickname !== '' ? chat.nickname : chat.socketID} | {chat.time}</span>{chat.message}</div> : <div name="chat-bubble" key={index} className="in"><span className="username">{chat.nickname !== '' ? chat.nickname : chat.socketID} | {chat.time}</span>{chat.message}</div>)}
         </div>
       </section>
       {/* End Body Content */}
